@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"go-base/api/middlewares/guard"
-	"go-base/services"
+	"go-base/api/services"
 
 	"github.com/gin-gonic/gin"
 )

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"go-base/api/exception"
 	"go-base/driver"
-	"go-base/internal/exception"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
