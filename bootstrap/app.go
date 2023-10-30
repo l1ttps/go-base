@@ -23,6 +23,7 @@ func App() *gin.Engine {
 
 		Controllers: []Controller{
 			controllers.AppController,
+			controllers.AuthController,
 		},
 
 		Middlewares: []gin.HandlerFunc{
