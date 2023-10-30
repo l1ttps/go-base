@@ -17,7 +17,6 @@ func AppController() *gin.Engine {
 		basePath: "/hello-world",
 		routes: []RouteBase{
 			Get("/", appService.HelloWorldGet),
-
 			Post("/", appService.HelloWorldPost),
 		},
 	})

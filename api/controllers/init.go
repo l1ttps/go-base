@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"go-base/driver"
 
 	"github.com/gin-gonic/gin"
@@ -23,18 +24,26 @@ func Controller(params ControllerBase) *gin.Engine {
 	}
 
 	for _, route := range params.routes {
-		if handlerFunc, exists := methodMap[route.method]; exists {
-			handlerFunc(route.basePath, route.handler)
+		handlerFunc, exists := methodMap[route.method]
+		if !exists {
+			fmt.Printf("Invalid HTTP method: %s\n", route.method)
+			continue
 		}
+		handlerFunc(route.basePath, append(route.middlewares, route.handler)...)
+		// if len(route.middlewares) > 0 {
+		// 	r.Use(route.middlewares...)
+		// }
+		// r.Use(route.handler)
 	}
 
 	return drive
 }
 
 type RouteBase struct {
-	basePath string
-	handler  gin.HandlerFunc
-	method   HTTPMethod
+	basePath    string
+	handler     gin.HandlerFunc
+	method      HTTPMethod
+	middlewares []gin.HandlerFunc
 }
 
 type MethodBase struct {
@@ -65,30 +74,31 @@ const (
 	PATCH  HTTPMethod = "PATCH"
 )
 
-func NewRouteBase(basePath string, handler gin.HandlerFunc, method HTTPMethod) RouteBase {
+func NewRouteBase(basePath string, handler gin.HandlerFunc, method HTTPMethod, middlewares []gin.HandlerFunc) RouteBase {
 	return RouteBase{
-		basePath: basePath,
-		handler:  handler,
-		method:   method,
+		basePath:    basePath,
+		handler:     handler,
+		method:      method,
+		middlewares: middlewares,
 	}
 }
 
-func Get(basePath string, handler gin.HandlerFunc) RouteBase {
-	return NewRouteBase(basePath, handler, GET)
+func Get(basePath string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, GET, middlewares)
 }
 
-func Post(basePath string, handler gin.HandlerFunc) RouteBase {
-	return NewRouteBase(basePath, handler, POST)
+func Post(basePath string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, POST, middlewares)
 }
 
-func Put(basePath string, handler gin.HandlerFunc) RouteBase {
-	return NewRouteBase(basePath, handler, PUT)
+func Put(basePath string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, PUT, middlewares)
 }
 
-func Delete(basePath string, handler gin.HandlerFunc) RouteBase {
-	return NewRouteBase(basePath, handler, DELETE)
+func Delete(basePath string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, DELETE, middlewares)
 }
 
-func Patch(basePath string, handler gin.HandlerFunc) RouteBase {
-	return NewRouteBase(basePath, handler, PATCH)
+func Patch(basePath string, handler gin.HandlerFunc, middlewares ...gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, PATCH, middlewares)
 }
