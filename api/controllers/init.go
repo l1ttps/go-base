@@ -36,14 +36,17 @@ func Controller(basePath string, routes ...RouteBase) *gin.Engine {
 			continue
 		}
 		// handlerFunc(route.basePath, append(route.middlewares, route.handler)...)
-		handlerFunc(route.basePath, append(route.middlewares, func(ctx *gin.Context) {
-			ctx.JSON(200, route.handler())
-			ctx.Abort()
-			return
-		})...)
+		handlerFunc(route.basePath, append(route.middlewares, PipeResponse(route.handler))...)
 	}
 
 	return drive
+}
+
+func PipeResponse(handler func() any) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		response := handler()
+		ctx.JSON(200, response)
+	}
 }
 
 type RouteBase struct {
