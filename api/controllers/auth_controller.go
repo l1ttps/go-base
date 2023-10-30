@@ -14,9 +14,11 @@ import (
 // guard, and a Get route with the HelloWorldGet method from the appService variable.
 // The returned *gin.Engine instance is used for handling HTTP requests and responses.
 func AuthController() *gin.Engine {
-	service := services.AuthService()
-
+	appService := services.AuthService()
 	return Controller("/auth",
-		Post("/login", service.Login),
+		Post("/login", func() any {
+			return appService.Login()
+		},
+		),
 	)
 }

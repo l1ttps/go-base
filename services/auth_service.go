@@ -1,7 +1,5 @@
 package services
 
-import "github.com/gin-gonic/gin"
-
 type AuthServiceType struct {
 }
 
@@ -17,8 +15,6 @@ func AuthService() *AuthServiceType {
 //
 // It takes a pointer to the AuthServiceType struct and a pointer to the gin.Context struct as parameters.
 // It does not return anything.
-func (authService *AuthServiceType) Login(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "login handled",
-	})
+func (authService *AuthServiceType) Login() any {
+	return "Login is working"
 }
