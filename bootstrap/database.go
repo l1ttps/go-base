@@ -20,6 +20,7 @@ func DatabaseConnect() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	println("Connected to the database")
 	// Migrate the schema
 	db.AutoMigrate()
 	return db

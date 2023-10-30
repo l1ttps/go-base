@@ -14,11 +14,10 @@ import (
 // There are no return types specified for this function.
 func AppController() *gin.Engine {
 	appService := services.AppService()
-
 	return Controller("/hello-world",
+		Get("/", appService.HelloWorldGet),
 		Post("/", appService.HelloWorldPost,
 			guard.UseGuard(guard.TestGuard),
 		),
-		Get("/", appService.HelloWorldGet),
 	)
 }
