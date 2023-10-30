@@ -13,13 +13,12 @@ import (
 // There are no return types specified for this function.
 func AppController() *gin.Engine {
 	appService := services.AppService()
-	appController := ControllerBase{
+	return Controller(ControllerBase{
 		basePath: "/hello-world",
 		routes: []RouteBase{
 			Get("/", appService.HelloWorldGet),
 
 			Post("/", appService.HelloWorldPost),
 		},
-	}
-	return Controller(appController)
+	})
 }

@@ -14,30 +14,30 @@ type ControllerBase struct {
 func Controller(params ControllerBase) *gin.Engine {
 	var drive = driver.Instance
 	c := drive.Group(params.basePath)
+	methodMap := map[HTTPMethod]func(string, ...gin.HandlerFunc) gin.IRoutes{
+		"GET":    c.GET,
+		"POST":   c.POST,
+		"PUT":    c.PUT,
+		"DELETE": c.DELETE,
+		"PATCH":  c.PATCH,
+	}
+
 	for _, route := range params.routes {
-		switch route.method {
-		case "GET":
-			c.GET(route.basePath, route.handler)
-		case "POST":
-			c.POST(route.basePath, route.handler)
-		case "PUT":
-			c.PUT(route.basePath, route.handler)
-		case "DELETE":
-			c.DELETE(route.basePath, route.handler)
-		case "PATCH":
-			c.PATCH(route.basePath, route.handler)
+		if handlerFunc, exists := methodMap[route.method]; exists {
+			handlerFunc(route.basePath, route.handler)
 		}
 	}
+
 	return drive
 }
 
 type RouteBase struct {
 	basePath string
 	handler  gin.HandlerFunc
-	method   string
+	method   HTTPMethod
 }
 
-type MethodHandler struct {
+type MethodBase struct {
 	basePath string
 	handler  gin.HandlerFunc
 	configs  MethodHandlerConfigs
@@ -55,42 +55,40 @@ type OpenApiConfigs struct {
 	success     string
 }
 
-func Get(basePath string, handler gin.HandlerFunc) RouteBase {
+type HTTPMethod string
+
+const (
+	GET    HTTPMethod = "GET"
+	POST   HTTPMethod = "POST"
+	PUT    HTTPMethod = "PUT"
+	DELETE HTTPMethod = "DELETE"
+	PATCH  HTTPMethod = "PATCH"
+)
+
+func NewRouteBase(basePath string, handler gin.HandlerFunc, method HTTPMethod) RouteBase {
 	return RouteBase{
 		basePath: basePath,
 		handler:  handler,
-		method:   "GET",
+		method:   method,
 	}
+}
+
+func Get(basePath string, handler gin.HandlerFunc) RouteBase {
+	return NewRouteBase(basePath, handler, GET)
 }
 
 func Post(basePath string, handler gin.HandlerFunc) RouteBase {
-	return RouteBase{
-		basePath: basePath,
-		handler:  handler,
-		method:   "POST",
-	}
+	return NewRouteBase(basePath, handler, POST)
 }
 
 func Put(basePath string, handler gin.HandlerFunc) RouteBase {
-	return RouteBase{
-		basePath: basePath,
-		handler:  handler,
-		method:   "PUT",
-	}
+	return NewRouteBase(basePath, handler, PUT)
 }
 
 func Delete(basePath string, handler gin.HandlerFunc) RouteBase {
-	return RouteBase{
-		basePath: basePath,
-		handler:  handler,
-		method:   "DELETE",
-	}
+	return NewRouteBase(basePath, handler, DELETE)
 }
 
 func Patch(basePath string, handler gin.HandlerFunc) RouteBase {
-	return RouteBase{
-		basePath: basePath,
-		handler:  handler,
-		method:   "PATCH",
-	}
+	return NewRouteBase(basePath, handler, PATCH)
 }
