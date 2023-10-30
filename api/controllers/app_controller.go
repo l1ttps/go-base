@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	guard "go-base/api/middlewares/guards"
+	"go-base/api/middlewares/guard"
 	"go-base/services"
 
 	"github.com/gin-gonic/gin"
@@ -20,12 +20,18 @@ var (
 func AppController() *gin.Engine {
 
 	appService := services.AppService()
-	return Controller("/hello-world",
-		Get("/",
-			func() any {
+	return Controller("/",
+		Get("/hello-world",
+			func() interface{} {
 				return appService.HelloWorldGet()
 			},
 			UseGuard(TestGuard),
+		),
+
+		Get("/forbidden",
+			func() interface{} {
+				return appService.Forbidden()
+			},
 		),
 	)
 }

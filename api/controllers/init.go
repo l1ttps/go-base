@@ -3,6 +3,8 @@ package controllers
 import (
 	"fmt"
 	"go-base/driver"
+	"go-base/internal/exception"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,10 +44,44 @@ func Controller(basePath string, routes ...RouteBase) *gin.Engine {
 	return drive
 }
 
-func PipeResponse(handler func() any) gin.HandlerFunc {
+// PipeResponse generates a Gin middleware that handles the response of a given handler function.
+//
+// The handler function should return an interface{} type. The middleware checks the type of the response
+// and performs the appropriate action based on the type.
+//
+// If the response is of type exception.HttpExceptionResponse, the middleware returns a JSON response
+// with the status and message from the exception.
+//
+// If the response is of type map[string]interface{}, the middleware checks if the map contains a "status"
+// field of type int and a "message" field of type string. If both fields exist, the middleware returns
+// a JSON response with the status and message from the map.
+//
+// If the response is of any other type, the middleware returns a JSON response with the response itself.
+func PipeResponse(handler func() interface{}) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		response := handler()
-		ctx.JSON(200, response)
+
+		if httpException, ok := response.(exception.HttpExceptionResponse); ok {
+			ctx.JSON(httpException.Status, gin.H{
+				"status":  httpException.Status,
+				"message": httpException.Message,
+			})
+			return
+		}
+
+		if status, ok := response.(map[string]interface{}); ok {
+			statusCode, exists := status["status"].(int)
+			message, messageExists := status["message"].(string)
+			if exists && messageExists {
+				ctx.JSON(statusCode, gin.H{
+					"status":  statusCode,
+					"message": message,
+				})
+				return
+			}
+		}
+
+		ctx.JSON(http.StatusOK, response)
 	}
 }
 
