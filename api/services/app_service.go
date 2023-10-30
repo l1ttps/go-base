@@ -1,9 +1,6 @@
 package services
 
-import (
-	"go-base/internal/exception"
-	"net/http"
-)
+import exception "go-base/api/exception"
 
 type AppServiceType struct {
 }
@@ -29,5 +26,5 @@ func (AppService *AppServiceType) HelloWorldGet() interface{} {
 }
 
 func (AppService *AppServiceType) Forbidden() interface{} {
-	return exception.HttpException(http.StatusForbidden, "Forbidden")
+	return exception.ForbiddenException()
 }

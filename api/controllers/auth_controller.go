@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"go-base/services"
+	"go-base/api/services"
 
 	"github.com/gin-gonic/gin"
 )
