@@ -22,14 +22,14 @@ func AppController() *gin.Engine {
 	appService := services.AppService()
 	return Controller("/",
 		Get("/hello-world",
-			func() interface{} {
+			func(c *gin.Context) interface{} {
 				return appService.HelloWorldGet()
 			},
 			UseGuard(TestGuard),
 		),
 
 		Get("/forbidden",
-			func() interface{} {
+			func(c *gin.Context) interface{} {
 				return appService.Forbidden()
 			},
 		),

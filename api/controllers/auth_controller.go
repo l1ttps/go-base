@@ -16,7 +16,7 @@ import (
 func AuthController() *gin.Engine {
 	appService := services.AuthService()
 	return Controller("/auth",
-		Post("/login", func() any {
+		Post("/login", func(c *gin.Context) any {
 			return appService.Login()
 		},
 		),

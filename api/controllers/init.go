@@ -57,9 +57,9 @@ func Controller(basePath string, routes ...RouteBase) *gin.Engine {
 // a JSON response with the status and message from the map.
 //
 // If the response is of any other type, the middleware returns a JSON response with the response itself.
-func PipeResponse(handler func() interface{}) gin.HandlerFunc {
+func PipeResponse(handler func(c *gin.Context) interface{}) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		response := handler()
+		response := handler(ctx)
 
 		if httpException, ok := response.(exception.HttpExceptionResponse); ok {
 			ctx.JSON(httpException.Status, gin.H{
@@ -87,7 +87,7 @@ func PipeResponse(handler func() interface{}) gin.HandlerFunc {
 
 type RouteBase struct {
 	basePath    string
-	handler     func() any
+	handler     func(c *gin.Context) any
 	method      HTTPMethod
 	middlewares []gin.HandlerFunc
 }
@@ -121,7 +121,7 @@ const (
 // method: the HTTP method for the route.
 // middlewares: an array of middleware functions for the route.
 // Returns: a RouteBase struct.
-func NewRouteBase(basePath string, handler func() any, method HTTPMethod, middlewares []gin.HandlerFunc) RouteBase {
+func NewRouteBase(basePath string, handler func(c *gin.Context) any, method HTTPMethod, middlewares []gin.HandlerFunc) RouteBase {
 	return RouteBase{
 		basePath:    basePath,
 		handler:     handler,
@@ -130,7 +130,7 @@ func NewRouteBase(basePath string, handler func() any, method HTTPMethod, middle
 	}
 }
 
-func TestMethod(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func TestMethod(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, GET, middlewares)
 }
 
@@ -145,7 +145,7 @@ func TestMethod(basePath string, handler func() any, middlewares ...gin.HandlerF
 //
 // Return:
 // - RouteBase: a new instance of RouteBase
-func Get(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func Get(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, GET, middlewares)
 }
 
@@ -160,7 +160,7 @@ func Get(basePath string, handler func() any, middlewares ...gin.HandlerFunc) Ro
 //
 // Return:
 // - RouteBase: a new instance of RouteBase
-func Post(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func Post(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, POST, middlewares)
 }
 
@@ -173,7 +173,7 @@ func Post(basePath string, handler func() any, middlewares ...gin.HandlerFunc) R
 //
 // Return:
 // - RouteBase: a new RouteBase instance.
-func Put(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func Put(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, PUT, middlewares)
 }
 
@@ -186,7 +186,7 @@ func Put(basePath string, handler func() any, middlewares ...gin.HandlerFunc) Ro
 //
 // Return:
 // - RouteBase: The newly created RouteBase.
-func Delete(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func Delete(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, DELETE, middlewares)
 }
 
@@ -199,6 +199,6 @@ func Delete(basePath string, handler func() any, middlewares ...gin.HandlerFunc)
 //
 // Return:
 // - RouteBase: The created RouteBase object.
-func Patch(basePath string, handler func() any, middlewares ...gin.HandlerFunc) RouteBase {
+func Patch(basePath string, handler func(c *gin.Context) any, middlewares ...gin.HandlerFunc) RouteBase {
 	return NewRouteBase(basePath, handler, PATCH, middlewares)
 }
